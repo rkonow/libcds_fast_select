@@ -126,7 +126,11 @@ public:
 
     void range(int i1, int i2, int j1, int j2, int leftb, int rightb, int symb, int level, vector<int> *res);
 
+    void range_sum(int i1, int i2, int j1, int j2, int leftb, int rightb, int symb, int level, uint &res);
+
     void range(int i1, int i2, int j1, int j2, vector<int> *res);
+
+    void range_sum(int i1, int i2, int j1, int j2, uint &res);
 
     int trackUp(int i, int leftb, int level);
 

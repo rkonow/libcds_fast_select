@@ -441,6 +441,46 @@ int WaveletTreeNoptrs::trackUp(int pos, int symb, int l) {
     return pos - 1;
 }
 
+void WaveletTreeNoptrs::range_sum(int i1, int i2, int j1, int j2, int leftb, int rightb, int symb, int level, uint &res) {
+    if (leftb > j2 || rightb < j1) return;
+
+    if (leftb >= j1 && rightb <= j2) {
+        res += i2 - i1 + 1;
+//        for (int i = i1; i <= i2; i++) {
+//            res->push_back(trackUp(i + 1, symb, level - 1));
+//        }
+        return;
+    }
+
+    if (level == (int) height) return;
+
+    // left side
+    int newleftb = symb;
+    int newrightb = (int) ((uint) symb | (uint) ((1u << (height - level - 1)) - 1));
+    int start = OCC[symb];
+    int before = 0;
+    if (start > 0)
+        before = bitstring[level]->rank0(start - 1);
+    int r0i1ps = ((i1 + start > 0) ? bitstring[level]->rank0(i1 + start - 1) : 0);
+    int newi1 = r0i1ps - before;
+    int r0i2ps = bitstring[level]->rank0(start + i2);
+    int newi2 = r0i2ps - before - 1;
+
+    if (newi1 <= newi2) {
+        range_sum(newi1, newi2, j1, j2, newleftb, newrightb, symb, level + 1, res);
+    }
+
+    // right side
+    newleftb = (int) ((uint) symb | (1u << (height - level - 1)));
+    newrightb = (int) ((uint) symb | ((1u << (height - level)) - 1));
+    before = start - before;
+    newi1 = (i1 + start - r0i1ps) - before;
+    newi2 = (start + i2 - r0i2ps + 1) - before - 1;
+    if (newi1 <= newi2) {
+        range_sum(newi1, newi2, j1, j2, newleftb, newrightb, newleftb, level + 1, res);
+    }
+}
+
 void WaveletTreeNoptrs::range(int i1, int i2, int j1, int j2, int leftb, int rightb, int symb, int level, vector<int> *res) {
     if (leftb > j2 || rightb < j1) return;
 
@@ -487,6 +527,10 @@ uint WaveletTreeNoptrs::set(uint val, uint ind) const {
 
 void WaveletTreeNoptrs::range(int i1, int i2, int j1, int j2, vector<int> *res) {
     range(i1, i2, j1, j2, 0, max_v, 0, 0, res);
+}
+
+void WaveletTreeNoptrs::range_sum(int i1, int i2, int j1, int j2, uint& res) {
+    range_sum(i1, i2, j1, j2, 0, max_v, 0, 0, res);
 }
 
 std::vector<uint> *WaveletTreeNoptrs::intersect(std::vector<pair<size_t, size_t> > &ranges, size_t thres) {

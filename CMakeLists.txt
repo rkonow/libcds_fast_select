@@ -13,4 +13,7 @@ include_directories(./)
 
 
 add_executable(testbitmap bitsequenceTest.cpp)
+add_executable(testrangesum rangesumTest.cpp)
+
 target_link_libraries (testbitmap LINK_PUBLIC cds )
+target_link_libraries (testrangesum LINK_PUBLIC cds )
